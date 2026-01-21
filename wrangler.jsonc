@@ -1,4 +1,8 @@
 {
-  "name": "derwentsec2026",
+  "name": "derwentsec-site",
   "compatibility_date": "2026-01-21",
+  "assets": {
+    "directory": "./",
+    "binding": "ASSETS"
+  }
 }
