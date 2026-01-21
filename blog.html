@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog | Cybersecurity Insights | DerwentSec</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="logoMain2025.png" type="image/png">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111827;
+            /* Dark blue-gray background */
+            color: #E5E7EB;
+            /* Light gray text */
+        }
+
+        .glass-card {
+            background: rgba(31, 41, 55, 0.5);
+            /* Semi-transparent dark background */
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+        }
+
+        .accent-glow {
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.4), 0 0 5px rgba(59, 130, 246, 0.6);
+        }
+
+        .section-title {
+            border-bottom: 2px solid #3B82F6;
+            padding-bottom: 0.5rem;
+            display: inline-block;
+        }
+    </style>
+</head>
+
+<body class="antialiased">
+
+    <header class="bg-gray-900/80 backdrop-blur-sm sticky top-0 z-50 border-b border-gray-700">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="index.html" class="flex items-center space-x-2">
+                <span class="text-2xl font-bold text-white">DerwentSec</span>
+            </a>
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="index.html#services" class="text-gray-300 hover:text-blue-400 transition-colors">Services</a>
+                <a href="index.html#basic-penetration" class="text-gray-300 hover:text-blue-400 transition-colors">Basic
+                    Pentest</a>
+                <a href="blog.html" class="text-gray-300 hover:text-blue-400 transition-colors">Blog</a>
+                <a href="index.html#contact" class="text-gray-300 hover:text-blue-400 transition-colors">Contact</a>
+
+                <div class="flex items-center space-x-4 pl-4 border-l border-gray-700">
+                    <a href="https://x.com/derwent_sec" target="_blank" aria-label="Follow us on X (formerly Twitter)"
+                        class="text-gray-300 hover:text-blue-400 transition-colors">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path
+                                d="M18.901 1.153h3.682l-8.026 9.273 9.492 11.455h-7.794l-5.694-6.883-7.55 6.883H.272l8.363-9.664L0 1.153h8.175l5.127 6.208L18.901 1.153zm-.21 19.34L7.545 3.003H5.25L17.79 21.49H18.69z" />
+                        </svg>
+                    </a>
+
+                    <a href="https://www.facebook.com/profile.php?id=61580143148961" target="_blank"
+                        aria-label="Follow us on Facebook" class="text-gray-300 hover:text-blue-400 transition-colors">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path
+                                d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.96 3.65 9.07 8.44 9.8V15h-2.54v-3h2.54V9.75c0-2.5 1.52-3.87 3.78-3.87 1.08 0 2.01.17 2.28.32v2.54h-1.5c-1.24 0-1.48.59-1.48 1.46V12h3.04l-.49 3h-2.55v5.8c4.79-.73 8.44-4.84 8.44-9.8z" />
+                        </svg>
+                    </a>
+                </div>
+                <button id="mobile-menu-button" class="md:hidden text-white">
+                    <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                    </svg>
+                </button>
+        </nav>
+        <div id="mobile-menu" class="md:hidden px-6 pb-4 space-y-2">
+            <a href="blog.html" class="text-gray-300 hover:text-blue-400 transition-colors">Blog</a>
+            <div class="flex items-center space-x-4 pl-4 border-l border-gray-700">
+                <a href="https://x.com/derwent_sec" target="_blank" aria-label="Follow us on X (formerly Twitter)"
+                    class="text-gray-300 hover:text-blue-400 transition-colors">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path
+                            d="M18.901 1.153h3.682l-8.026 9.273 9.492 11.455h-7.794l-5.694-6.883-7.55 6.883H.272l8.363-9.664L0 1.153h8.175l5.127 6.208L18.901 1.153zm-.21 19.34L7.545 3.003H5.25L17.79 21.49H18.69z" />
+                    </svg>
+                </a>
+
+                <a href="https://www.facebook.com/profile.php?id=61580143148961" target="_blank"
+                    aria-label="Follow us on Facebook" class="text-gray-300 hover:text-blue-400 transition-colors">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path
+                            d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.96 3.65 9.07 8.44 9.8V15h-2.54v-3h2.54V9.75c0-2.5 1.52-3.87 3.78-3.87 1.08 0 2.01.17 2.28.32v2.54h-1.5c-1.24 0-1.48.59-1.48 1.46V12h3.04l-.49 3h-2.55v5.8c4.79-.73 8.44-4.84 8.44-9.8z" />
+                    </svg>
+                </a>
+            </div>
+    </header>
+
+    <main class="py-16 md:py-24">
+        <div class="container mx-auto px-6 max-w-4xl">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-white text-center section-title mb-16">
+                Cybersecurity Insights
+            </h1>
+
+            <div class="space-y-12">
+
+                <article class="glass-card p-6 md:p-8 hover:border-blue-500 transition-all duration-300">
+                    <div class="flex flex-col md:flex-row md:items-start gap-6">
+                        <div class="flex-grow">
+                            <p class="text-sm uppercase tracking-wider text-blue-400 mb-2">Password Security | 2025</p>
+                            <h2 class="text-2xl font-bold text-white mb-3 hover:text-blue-300 transition-colors">                                
+                                <a href="https://www.notion.so/craigswork/Password-Security-and-Multifactor-Authentication-2a09a62fb0df80889c99f1de4a4e8688?source=copy_link" target="_blank">The Simple Secret to Strong Passwords and MFA</a>
+                            </h2>                            
+                            <a href="https://www.notion.so/craigswork/Password-Security-and-Multifactor-Authentication-2a09a62fb0df80889c99f1de4a4e8688?source=copy_link" target="_blank"
+                                class="text-blue-400 font-medium hover:text-blue-500 flex items-center">
+                                Read More
+                                <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                    viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="glass-card p-6 md:p-8 hover:border-blue-500 transition-all duration-300">
+                    <div class="flex flex-col md:flex-row md:items-start gap-6">
+                        <div class="flex-grow">
+                            <p class="text-sm uppercase tracking-wider text-blue-400 mb-2">Open Source Intelligence (OSINT) | 2025</p>
+                            <h2 class="text-2xl font-bold text-white mb-3 hover:text-blue-300 transition-colors">                                
+                                <a href="https://www.notion.so/craigswork/Open-Source-Intelligence-2a19a62fb0df803aa39ae63c6332ab08?source=copy_link" target="_blank">Investigate Yourself with Open Source Intelligence</a>
+                            </h2>                            
+                            <a href="https://www.notion.so/craigswork/Open-Source-Intelligence-2a19a62fb0df803aa39ae63c6332ab08?source=copy_link" target="_blank"
+                                class="text-blue-400 font-medium hover:text-blue-500 flex items-center">
+                                Read More
+                                <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                    viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </article>
+                
+
+            </div>
+
+            <div class="mt-16 text-center">
+                <p class="text-gray-500">End of recent posts. Check back soon!</p>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="bg-gray-900 border-t border-gray-700">
+        <div class="container mx-auto px-6 py-6 text-center text-gray-400">
+            <p>&copy; 2026 DerwentSec. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Close mobile menu when a link is clicked
+        const mobileMenuLinks = mobileMenu.querySelectorAll('a');
+        mobileMenuLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+        });
+    </script>
+
+</body>
+
+</html>
