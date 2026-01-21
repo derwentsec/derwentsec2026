@@ -1,5 +1,4 @@
 {
-  "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "derwentsecupdated2026",
   "compatibility_date": "2026-01-21",
   "assets": {
