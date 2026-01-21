@@ -1,5 +1,8 @@
 {
-  "name": "derwentsec2026",
-  "pages_build_output_dir": "./",
-  "compatibility_date": "2026-01-21"
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "derwentsecupdated2026",
+  "compatibility_date": "2026-01-21",
+  "assets": {
+    "directory": "./public/"
+  }
 }
