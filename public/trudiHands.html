@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tournament 4020833874 &mdash; all 64 hands</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Lexend:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#E7E8E1; --card:#F6F6F1; --rule:#C9CBC0;
+  --ink:#1B2420; --ink-soft:#55605A;
+  --spade:#1B2420; --heart:#B03A3A; --diamond:#2A6DA6; --club:#38784C;
+  --up:#38784C; --down:#B03A3A;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:"Atkinson Hyperlegible",Verdana,sans-serif;
+  font-size:18px; line-height:1.75; letter-spacing:.005em;
+}
+.wrap{max-width:1180px; margin:0 auto; padding:40px 22px 90px}
+
+/* ---- header ---- */
+.meta{
+  font-size:14px; letter-spacing:.09em; text-transform:uppercase;
+  color:var(--ink-soft); border-bottom:2px solid var(--rule);
+  padding-bottom:12px; margin-bottom:30px; line-height:1.9;
+}
+h1{
+  font-family:Lexend,"Atkinson Hyperlegible",sans-serif; font-weight:700;
+  font-size:clamp(34px,6vw,58px); line-height:1.15; margin:0 0 14px;
+  letter-spacing:-.015em; max-width:16ch;
+}
+.standfirst{max-width:58ch; margin:0 0 44px; color:var(--ink-soft); font-size:19px}
+.standfirst b{color:var(--ink)}
+
+h2{
+  font-family:Lexend,sans-serif; font-weight:700; font-size:26px;
+  margin:0 0 6px; letter-spacing:-.01em;
+}
+.sub{margin:0 0 22px; color:var(--ink-soft); font-size:17px; max-width:60ch}
+section{margin-bottom:64px}
+
+/* ---- stats ---- */
+.stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:14px}
+.stat{background:var(--card); border:2px solid var(--rule); border-radius:12px; padding:18px 20px}
+.stat__v{font-family:Lexend,sans-serif; font-weight:700; font-size:36px; line-height:1.2;
+  font-variant-numeric:tabular-nums}
+.stat__k{font-size:15px; color:var(--ink-soft); line-height:1.5}
+
+/* ---- chart ---- */
+.chartbox{background:var(--card); border:2px solid var(--rule); border-radius:14px; padding:16px 10px 6px}
+svg{display:block; width:100%; height:auto}
+.band{fill:var(--ink); opacity:.028}
+.band:nth-of-type(even){opacity:.06}
+.band-lbl{fill:var(--ink-soft); font-size:12px; text-anchor:middle;
+  font-family:"Atkinson Hyperlegible",sans-serif; letter-spacing:.08em}
+.grid{stroke:var(--rule); stroke-width:1}
+.ytick{fill:var(--ink-soft); font-size:12px; text-anchor:end;
+  font-family:"Atkinson Hyperlegible",sans-serif}
+.area{fill:var(--club); opacity:.13}
+.curve{fill:none; stroke:var(--club); stroke-width:3; stroke-linejoin:round; stroke-linecap:round}
+.hdot{fill:var(--club); opacity:0; transition:opacity .15s, r .15s}
+.hdot.on{opacity:1; r:6}
+.bust-tick{stroke:var(--ink); stroke-width:1; opacity:.22; stroke-dasharray:3 4}
+.bust-lbl{fill:var(--ink-soft); font-size:12px; text-anchor:middle;
+  font-family:"Atkinson Hyperlegible",sans-serif; letter-spacing:.04em}
+.mark-dot{fill:var(--heart)}
+.mark-lbl{fill:var(--ink); font-size:14px; font-weight:700;
+  font-family:"Atkinson Hyperlegible",sans-serif}
+.axis-note{display:flex; justify-content:space-between; font-size:14px;
+  color:var(--ink-soft); padding:2px 12px 10px}
+
+/* ---- filters ---- */
+.filters{display:flex; flex-wrap:wrap; gap:10px; margin:0 0 24px}
+.filters button{
+  font:inherit; font-size:16px; background:var(--card); color:var(--ink);
+  border:2px solid var(--rule); border-radius:999px; padding:8px 18px; cursor:pointer;
+}
+.filters button[aria-pressed="true"]{background:var(--ink); color:var(--paper); border-color:var(--ink)}
+.filters button:focus-visible,.cell:focus-visible{outline:3px solid var(--diamond); outline-offset:3px}
+
+/* ---- hand grid ---- */
+.grid-hands{display:grid; grid-template-columns:repeat(auto-fill,minmax(255px,1fr)); gap:14px}
+.cell{
+  background:var(--card); border:2px solid var(--rule); border-left-width:8px;
+  border-radius:12px; padding:14px 16px 16px;
+}
+.cell--won{border-left-color:var(--up)}
+.cell--lost{border-left-color:var(--down)}
+.cell--fold{border-left-color:var(--rule)}
+.cell--walk{border-left-color:var(--diamond)}
+.cell.hide{display:none}
+.cell__top{display:flex; align-items:center; gap:10px; margin-bottom:10px}
+.cell__n{font-size:15px; color:var(--ink-soft); font-variant-numeric:tabular-nums;
+  letter-spacing:.06em}
+.cell__pos{font-size:14px; font-weight:700; letter-spacing:.06em; padding:2px 9px;
+  border:2px solid var(--rule); border-radius:999px; line-height:1.5}
+.cell__net{margin-left:auto; font-weight:700; font-variant-numeric:tabular-nums; font-size:17px}
+.up{color:var(--up)} .down{color:var(--down)} .flat{color:var(--ink-soft)}
+.cell__cards{display:flex; gap:7px; margin-bottom:12px}
+.cell__act{margin:0; font-size:16px; line-height:1.6}
+.cell__note{display:inline-block; margin-top:10px; font-size:14px; font-weight:700;
+  background:var(--ink); color:var(--paper); padding:3px 10px; border-radius:6px}
+.cell__bust{display:block; margin-top:10px; font-size:14px; color:var(--ink-soft);
+  border-top:2px solid var(--rule); padding-top:8px}
+
+/* ---- playing cards ---- */
+.pc{
+  display:inline-flex; flex-direction:column; align-items:center; justify-content:center;
+  width:42px; height:56px; background:#fff; border:2px solid var(--rule);
+  border-radius:6px; line-height:1.1;
+}
+.pc__r{font-weight:700; font-size:20px}
+.pc__s{font-size:17px; margin-top:-2px}
+.pc--spade{color:var(--spade)}
+.pc--heart{color:var(--heart)}
+.pc--diamond{color:var(--diamond)}
+.pc--club{color:var(--club)}
+
+.legend{display:flex; flex-wrap:wrap; gap:8px 22px; font-size:15px; color:var(--ink-soft);
+  margin-top:20px}
+.legend span{display:flex; align-items:center; gap:8px}
+.swatch{width:16px; height:16px; border-radius:4px; display:inline-block}
+
+footer{border-top:2px solid var(--rule); padding-top:18px; font-size:15px; color:var(--ink-soft)}
+@media (max-width:760px){
+  .band-lbl,.ytick{font-size:20px}
+  .mark-lbl{font-size:26px}
+  .bust-lbl{display:none}
+  .curve{stroke-width:5}
+  .wrap{padding:28px 16px 70px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<p class="meta">PokerStars &middot; Tournament 4020833874 &middot; $0.42 + $0.08 No-Limit Hold&rsquo;em &middot;
+9-max turbo &middot; 2 Aug 2026, 23:06&ndash;23:42</p>
+
+<h1>Sixty-four hands, thirty-six minutes, first place</h1>
+<p class="standfirst">You started with <b>1,500</b>, were left with <b>525</b> after hand 11,
+and finished with every chip on the table. Here is the whole run in one view &mdash;
+the stack curve on top, then every hand you were dealt.</p>
+
+<section>
+  <h2>The run</h2>
+  <p class="sub">Chip stack measured at the start of each hand. Dashed lines mark players
+  busting out. Roman numerals along the bottom are blind levels.</p>
+  <div class="chartbox">
+    <svg viewBox="0 0 1000 360" role="img"
+  aria-label="Chip stack across 64 hands: 1,500 at the start, a low of 525 at hand 11, and 13,500 at the finish.">
+  <rect class="band" x="62.0" y="54" width="64.4" height="254"/><text class="band-lbl" x="94.2" y="330">I</text><rect class="band" x="126.4" y="54" width="71.6" height="254"/><text class="band-lbl" x="162.2" y="330">II</text><rect class="band" x="198.0" y="54" width="71.6" height="254"/><text class="band-lbl" x="233.8" y="330">III</text><rect class="band" x="269.5" y="54" width="100.2" height="254"/><text class="band-lbl" x="319.6" y="330">IV</text><rect class="band" x="369.7" y="54" width="100.2" height="254"/><text class="band-lbl" x="419.8" y="330">V</text><rect class="band" x="469.9" y="54" width="271.9" height="254"/><text class="band-lbl" x="605.9" y="330">VI</text><rect class="band" x="741.8" y="54" width="157.4" height="254"/><text class="band-lbl" x="820.6" y="330">VII</text><rect class="band" x="899.3" y="54" width="71.6" height="254"/><text class="band-lbl" x="935.1" y="330">VIII</text>
+  <line class="grid" x1="62" y1="308.0" x2="978" y2="308.0"/><text class="ytick" x="52" y="314.0">0k</text><line class="grid" x1="62" y1="244.5" x2="978" y2="244.5"/><text class="ytick" x="52" y="250.5">3k</text><line class="grid" x1="62" y1="181.0" x2="978" y2="181.0"/><text class="ytick" x="52" y="187.0">7k</text><line class="grid" x1="62" y1="117.5" x2="978" y2="117.5"/><text class="ytick" x="52" y="123.5">10k</text><line class="grid" x1="62" y1="54.0" x2="978" y2="54.0"/><text class="ytick" x="52" y="60.0">14k</text>
+  <polygon class="area" points="62.0,308.0 62.0,280.8 76.3,280.8 90.6,280.8 104.9,280.8 119.2,280.2 133.6,280.2 147.9,280.8 162.2,281.1 176.5,273.4 190.8,273.4 205.1,275.6 219.4,298.5 233.8,298.5 248.1,297.1 262.4,297.1 276.7,298.0 291.0,286.2 305.3,286.2 319.6,286.2 333.9,262.6 348.2,262.6 362.6,262.6 376.9,264.5 391.2,265.8 405.5,253.6 419.8,253.6 434.1,253.6 448.4,244.0 462.8,245.4 477.1,180.1 491.4,180.1 505.7,180.1 520.0,186.6 534.3,188.4 548.6,188.4 562.9,188.4 577.2,199.3 591.6,195.7 605.9,203.0 620.2,203.0 634.5,204.8 648.8,204.8 663.1,208.4 677.4,204.8 691.8,204.8 706.1,203.0 720.4,199.3 734.7,193.9 749.0,197.5 763.3,185.7 777.6,172.1 791.9,176.2 806.2,172.1 820.6,168.0 834.9,170.3 849.2,158.0 863.5,180.7 877.8,184.8 892.1,173.5 906.4,177.6 920.8,180.7 935.1,186.6 949.4,65.2 963.7,67.4 978.0,63.1 978.0,308.0"/>
+  <polyline class="curve" points="62.0,280.8 76.3,280.8 90.6,280.8 104.9,280.8 119.2,280.2 133.6,280.2 147.9,280.8 162.2,281.1 176.5,273.4 190.8,273.4 205.1,275.6 219.4,298.5 233.8,298.5 248.1,297.1 262.4,297.1 276.7,298.0 291.0,286.2 305.3,286.2 319.6,286.2 333.9,262.6 348.2,262.6 362.6,262.6 376.9,264.5 391.2,265.8 405.5,253.6 419.8,253.6 434.1,253.6 448.4,244.0 462.8,245.4 477.1,180.1 491.4,180.1 505.7,180.1 520.0,186.6 534.3,188.4 548.6,188.4 562.9,188.4 577.2,199.3 591.6,195.7 605.9,203.0 620.2,203.0 634.5,204.8 648.8,204.8 663.1,208.4 677.4,204.8 691.8,204.8 706.1,203.0 720.4,199.3 734.7,193.9 749.0,197.5 763.3,185.7 777.6,172.1 791.9,176.2 806.2,172.1 820.6,168.0 834.9,170.3 849.2,158.0 863.5,180.7 877.8,184.8 892.1,173.5 906.4,177.6 920.8,180.7 935.1,186.6 949.4,65.2 963.7,67.4 978.0,63.1"/>
+  <circle class="hdot" id="d1" cx="62.0" cy="280.8" r="3"/><circle class="hdot" id="d2" cx="76.3" cy="280.8" r="3"/><circle class="hdot" id="d3" cx="90.6" cy="280.8" r="3"/><circle class="hdot" id="d4" cx="104.9" cy="280.8" r="3"/><circle class="hdot" id="d5" cx="119.2" cy="280.2" r="3"/><circle class="hdot" id="d6" cx="133.6" cy="280.2" r="3"/><circle class="hdot" id="d7" cx="147.9" cy="280.8" r="3"/><circle class="hdot" id="d8" cx="162.2" cy="281.1" r="3"/><circle class="hdot" id="d9" cx="176.5" cy="273.4" r="3"/><circle class="hdot" id="d10" cx="190.8" cy="273.4" r="3"/><circle class="hdot" id="d11" cx="205.1" cy="275.6" r="3"/><circle class="hdot" id="d12" cx="219.4" cy="298.5" r="3"/><circle class="hdot" id="d13" cx="233.8" cy="298.5" r="3"/><circle class="hdot" id="d14" cx="248.1" cy="297.1" r="3"/><circle class="hdot" id="d15" cx="262.4" cy="297.1" r="3"/><circle class="hdot" id="d16" cx="276.7" cy="298.0" r="3"/><circle class="hdot" id="d17" cx="291.0" cy="286.2" r="3"/><circle class="hdot" id="d18" cx="305.3" cy="286.2" r="3"/><circle class="hdot" id="d19" cx="319.6" cy="286.2" r="3"/><circle class="hdot" id="d20" cx="333.9" cy="262.6" r="3"/><circle class="hdot" id="d21" cx="348.2" cy="262.6" r="3"/><circle class="hdot" id="d22" cx="362.6" cy="262.6" r="3"/><circle class="hdot" id="d23" cx="376.9" cy="264.5" r="3"/><circle class="hdot" id="d24" cx="391.2" cy="265.8" r="3"/><circle class="hdot" id="d25" cx="405.5" cy="253.6" r="3"/><circle class="hdot" id="d26" cx="419.8" cy="253.6" r="3"/><circle class="hdot" id="d27" cx="434.1" cy="253.6" r="3"/><circle class="hdot" id="d28" cx="448.4" cy="244.0" r="3"/><circle class="hdot" id="d29" cx="462.8" cy="245.4" r="3"/><circle class="hdot" id="d30" cx="477.1" cy="180.1" r="3"/><circle class="hdot" id="d31" cx="491.4" cy="180.1" r="3"/><circle class="hdot" id="d32" cx="505.7" cy="180.1" r="3"/><circle class="hdot" id="d33" cx="520.0" cy="186.6" r="3"/><circle class="hdot" id="d34" cx="534.3" cy="188.4" r="3"/><circle class="hdot" id="d35" cx="548.6" cy="188.4" r="3"/><circle class="hdot" id="d36" cx="562.9" cy="188.4" r="3"/><circle class="hdot" id="d37" cx="577.2" cy="199.3" r="3"/><circle class="hdot" id="d38" cx="591.6" cy="195.7" r="3"/><circle class="hdot" id="d39" cx="605.9" cy="203.0" r="3"/><circle class="hdot" id="d40" cx="620.2" cy="203.0" r="3"/><circle class="hdot" id="d41" cx="634.5" cy="204.8" r="3"/><circle class="hdot" id="d42" cx="648.8" cy="204.8" r="3"/><circle class="hdot" id="d43" cx="663.1" cy="208.4" r="3"/><circle class="hdot" id="d44" cx="677.4" cy="204.8" r="3"/><circle class="hdot" id="d45" cx="691.8" cy="204.8" r="3"/><circle class="hdot" id="d46" cx="706.1" cy="203.0" r="3"/><circle class="hdot" id="d47" cx="720.4" cy="199.3" r="3"/><circle class="hdot" id="d48" cx="734.7" cy="193.9" r="3"/><circle class="hdot" id="d49" cx="749.0" cy="197.5" r="3"/><circle class="hdot" id="d50" cx="763.3" cy="185.7" r="3"/><circle class="hdot" id="d51" cx="777.6" cy="172.1" r="3"/><circle class="hdot" id="d52" cx="791.9" cy="176.2" r="3"/><circle class="hdot" id="d53" cx="806.2" cy="172.1" r="3"/><circle class="hdot" id="d54" cx="820.6" cy="168.0" r="3"/><circle class="hdot" id="d55" cx="834.9" cy="170.3" r="3"/><circle class="hdot" id="d56" cx="849.2" cy="158.0" r="3"/><circle class="hdot" id="d57" cx="863.5" cy="180.7" r="3"/><circle class="hdot" id="d58" cx="877.8" cy="184.8" r="3"/><circle class="hdot" id="d59" cx="892.1" cy="173.5" r="3"/><circle class="hdot" id="d60" cx="906.4" cy="177.6" r="3"/><circle class="hdot" id="d61" cx="920.8" cy="180.7" r="3"/><circle class="hdot" id="d62" cx="935.1" cy="186.6" r="3"/><circle class="hdot" id="d63" cx="949.4" cy="65.2" r="3"/><circle class="hdot" id="d64" cx="963.7" cy="67.4" r="3"/>
+  <line class="bust-tick" x1="219.4" y1="48.0" x2="219.4" y2="298.5"/><text class="bust-lbl" x="219.4" y="44.0">9th</text><line class="bust-tick" x1="262.4" y1="28.0" x2="262.4" y2="297.1"/><text class="bust-lbl" x="262.4" y="24.0">8th</text><line class="bust-tick" x1="305.3" y1="48.0" x2="305.3" y2="286.2"/><text class="bust-lbl" x="305.3" y="44.0">7th</text><line class="bust-tick" x1="333.9" y1="28.0" x2="333.9" y2="262.6"/><text class="bust-lbl" x="333.9" y="24.0">6th</text><line class="bust-tick" x1="534.3" y1="48.0" x2="534.3" y2="188.4"/><text class="bust-lbl" x="534.3" y="44.0">5th</text><line class="bust-tick" x1="605.9" y1="28.0" x2="605.9" y2="203.0"/><text class="bust-lbl" x="605.9" y="24.0">4th</text><line class="bust-tick" x1="777.6" y1="48.0" x2="777.6" y2="172.1"/><text class="bust-lbl" x="777.6" y="44.0">3rd</text><line class="bust-tick" x1="963.7" y1="28.0" x2="963.7" y2="67.4"/><text class="bust-lbl" x="963.7" y="24.0">2nd</text>
+  <circle class="mark-dot" cx="219.4" cy="298.5" r="5.5"/><text class="mark-lbl" text-anchor="middle" x="219.4" y="282.5">525 left</text><circle class="mark-dot" cx="462.8" cy="180.1" r="5.5"/><text class="mark-lbl" text-anchor="middle" x="462.8" y="158.1">Won 7,050</text><circle class="mark-dot" cx="935.1" cy="65.2" r="5.5"/><text class="mark-lbl" text-anchor="end" x="923.1" y="71.2">13,380 &mdash; the winner</text>
+</svg>
+    <div class="axis-note"><span>Hand 1</span><span>Hand 64</span></div>
+  </div>
+  <div class="legend">
+    <span><i class="swatch" style="background:var(--up)"></i> Chips won</span>
+    <span><i class="swatch" style="background:var(--down)"></i> Chips lost</span>
+    <span><i class="swatch" style="background:var(--rule)"></i> Folded</span>
+    <span><i class="swatch" style="background:var(--diamond)"></i> Walk</span>
+  </div>
+</section>
+
+<section>
+  <h2>The numbers</h2>
+  <div class="stats">
+    <div class="stat"><div class="stat__v">24 / 64</div>
+      <div class="stat__k">Hands you put money in voluntarily &mdash; 37.5% VPIP, inflated by the 13-hand heads-up stretch</div></div>
+    <div class="stat"><div class="stat__v">6 of 10</div>
+      <div class="stat__k">Showdowns won</div></div>
+    <div class="stat"><div class="stat__v">525</div>
+      <div class="stat__k">Lowest stack, at hand 12 &mdash; two and a half big blinds</div></div>
+    <div class="stat"><div class="stat__v">13,380</div>
+      <div class="stat__k">Biggest pot, hand 62 &mdash; the one that ended it</div></div>
+  </div>
+</section>
+
+<section>
+  <h2>Every hand</h2>
+  <p class="sub">Four-colour deck: spades black, hearts red, diamonds blue, clubs green.
+  The number in the corner is the hand, the pill is your position, the figure on the right
+  is chips won or lost including blinds and antes.</p>
+  <div class="filters" role="group" aria-label="Filter hands">
+    <button data-f="all" aria-pressed="true">All 64</button>
+    <button data-f="played" aria-pressed="false">Played (24)</button>
+    <button data-f="showdown" aria-pressed="false">Showdowns (10)</button>
+    <button data-f="won" aria-pressed="false">Won (20)</button>
+    <button data-f="lost" aria-pressed="false">Lost (9)</button>
+  </div>
+  <div class="grid-hands" id="grid">
+    <article class="cell cell--fold" data-tags="fold sat-out"
+      data-hand="1" tabindex="0">
+  <header class="cell__top"><span class="cell__n">01</span>
+    <span class="cell__pos">HJ</span>
+    <span class="cell__net flat">even</span></header>
+  <div class="cell__cards"><span class="pc pc--club"><span class="pc__r">9</span><span class="pc__s">&#9827;</span></span><span class="pc pc--spade"><span class="pc__r">5</span><span class="pc__s">&#9824;</span></span></div>
+  <p class="cell__act">Folded to a raise</p>
+</article><article class="cell cell--fold" data-tags="fold sat-out"
+      data-hand="2" tabindex="0">
+  <header class="cell__top"><span class="cell__n">02</span>
+    <span class="cell__pos">MP2</span>
+    <span class="cell__net flat">even</span></header>
+  <div class="cell__cards"><span class="pc pc--heart"><span class="pc__r">4</span><span class="pc__s">&#9829;</span></span><span class="pc pc--heart"><span class="pc__r">J</span><span class="pc__s">&#9829;</span></span></div>
+  <p class="cell__act">Folded</p>
+</article><article class="cell cell--fold" data-tags="fold sat-out"
+      data-hand="3" tabindex="0">
+  <header class="cell__top"><span class="cell__n">03</span>
+    <span class="cell__pos">MP1</span>
+    <span class="cell__net flat">even</span></header>
+  <div class="cell__cards"><span class="pc pc--spade"><span class="pc__r">8</span><span class="pc__s">&#9824;</span></span><span class="pc pc--spade"><span class="pc__r">T</span><span class="pc__s">&#9824;</span></span></div>
+  <p class="cell__act">Folded</p>
+</article><article class="cell cell--won" data-tags="won played"
+      data-hand="4" tabindex="0">
+  <header class="cell__top"><span class="cell__n">04</span>
+    <span class="cell__pos">UTG+1</span>
+    <span class="cell__net up">+30</span></header>
+  <div class="cell__cards"><span class="pc pc--diamond"><span class="pc__r">T</span><span class="pc__s">&#9830;</span></span><span class="pc pc--heart"><span class="pc__r">T</span><span class="pc__s">&#9829;</span></span></div>
+  <p class="cell__act">Opened to 60, took it down</p>
+</article><article class="cell cell--fold" data-tags="fold sat-out"
+      data-hand="5" tabindex="0">
+  <header class="cell__top"><span class="cell__n">05</span>
+    <span class="cell__pos">UTG</span>
+    <span class="cell__net flat">even</span></header>
+  <div class="cell__cards"><span class="pc pc--heart"><span class="pc__r">4</span><span class="pc__s">&#9829;</span></span><span class="pc pc--spade"><span class="pc__r">K</span><span class="pc__s">&#9824;</span></span></div>
+  <p class="cell__act">Folded</p>
+</article><article class="cell cell--lost" data-tags="lost sat-out"
+      data-hand="6" tabindex="0">
+  <header class="cell__top"><span class="cell__n">06</span>
+    <span class="cell__pos">BB</span>
+    <span class="cell__net down">-30</span></header>
+  <div class="cell__cards"><span class="pc pc--heart"><span class="pc__r">A</span><span class="pc__s">&#9829;</span></span><span class="pc pc--spade"><span class="pc__r">4</span><span class="pc__s">&#9824;</span></span></div>
+  <p class="cell__act">Checked three streets, folded river</p>
+</article><article class="cell cell--fold" data-tags="fold sat-out"
+      data-hand="7" tabindex="0">
+  <header class="cell__top"><span class="cell__n">07</span>
+    <span class="cell__pos">SB</span>
+    <span class="cell__net down">-15</span></header>
+  <div class="cell__cards"><span class="pc pc--heart"><span class="pc__r">2</span><span class="pc__s">&#9829;</span></span><span class="pc pc--diamond"><span class="pc__r">9</span><span class="pc__s">&#9830;</span></span></div>
+  <p class="cell__act">Folded to a 3-bet war</p>
+</article><article class="cell cell--won" data-tags="won played"
+      data-hand="8" tabindex="0">
+  <header class="cell__top"><span class="cell__n">08</span>
+    <span class="cell__pos">BTN</span>
+    <span class="cell__net up">+420</span></header>
+  <div class="cell__cards"><span class="pc pc--spade"><span class="pc__r">Q</span><span class="pc__s">&#9824;</span></span><span class="pc pc--club"><span class="pc__r">J</span><span class="pc__s">&#9827;</span></span></div>
+  <p class="cell__act">Raised, barrelled turn and river</p><span class="cell__note">First real pot</span>
+</article><article class="cell cell--fold" data-tags="fold sat-out"
+      data-hand="9" tabindex="0">
+  <header class="cell__top"><span class="cell__n">09</span>
+    <span class="cell__pos">CO</span>
+    <span class="cell__net flat">even</span></header>
+  <div class="cell__cards"><span class="pc pc--diamond"><span class="pc__r">7</span><span class="pc__s">&#9830;</span></span><span class="pc pc--club"><span class="pc__r">4</span><span class="pc__s">&#9827;</span></span></div>
+  <p class="cell__act">Folded</p>
+</article><article class="cell cell--lost" data-tags="lost played"
+      data-hand="10" tabindex="0">
+  <header class="cell__top"><span class="cell__n">10</span>
+    <span class="cell__pos">MP2</span>
+    <span class="cell__net down">-120</span></header>
+  <div class="cell__cards"><span class="pc pc--heart"><span class="pc__r">A</span><span class="pc__s">&#9829;</span></span><span class="pc pc--heart"><span class="pc__r">9</span><span class="pc__s">&#9829;</span></span></div>
+  <p class="cell__act">3-bet, called flop, folded turn</p>
+</article><article class="cell cell--lost" data-tags="lost played showdown"
+      data-hand="11" tabindex="0">
+  <header class="cell__top"><span class="cell__n">11</span>
+    <span class="cell__pos">MP1</span>
+    <span class="cell__net down">-1,260</span></header>
+  <div class="cell__cards"><span class="pc pc--spade"><span class="pc__r">A</span><span class="pc__s">&#9824;</span></span><span class="pc pc--spade"><span class="pc__r">J</span><span class="pc__s">&#9824;</span></span></div>
+  <p class="cell__act">Two pair into a straight, three-way all-in</p><span class="cell__note">Worst hand of the run</span>
+</article><article class="cell cell--fold" data-tags="fold sat-out"
+      data-hand="12" tabindex="0">
+  <header class="cell__top"><span class="cell__n">12</span>
+    <span class="cell__pos">UTG+1</span>
+    <span class="cell__net flat">even</span></header>
+  <div class="cell__cards"><span class="pc pc--heart"><span class="pc__r">J</span><span class="pc__s">&#9829;</span></span><span class="pc pc--diamond"><span class="pc__r">4</span><span class="pc__s">&#9830;</span></span></div>
+  <p class="cell__act">Folded</p><span class="cell__bust">Spazz3r_DK out in 9th</span>
+</article><article class="cell cell--won" data-tags="won played"
+      data-hand="13" tabindex="0">
+  <header class="cell__top"><span class="cell__n">13</span>
+    <span class="cell__pos">UTG+1</span>
+    <span class="cell__net up">+75</span></header>
+  <div class="cell__cards"><span class="pc pc--heart"><span class="pc__r">K</span><span class="pc__s">&#9829;</span></span><span class="pc pc--heart"><span class="pc__r">A</span><span class="pc__s">&#9829;</span></span></div>
+  <p class="cell__act">Opened, took the blinds</p>
+</article><article class="cell cell--fold" data-tags="fold sat-out"
+      data-hand="14" tabindex="0">
+  <header class="cell__top"><span class="cell__n">14</span>
+    <span class="cell__pos">UTG</span>
+    <span class="cell__net flat">even</span></header>
+  <div class="cell__cards"><span class="pc pc--club"><span class="pc__r">6</span><span class="pc__s">&#9827;</span></span><span class="pc pc--club"><span class="pc__r">T</span><span class="pc__s">&#9827;</span></span></div>
+  <p class="cell__act">Folded</p>
+</article><article class="cell cell--fold" data-tags="fold sat-out"
+      data-hand="15" tabindex="0">
+  <header class="cell__top"><span class="cell__n">15</span>
+    <span class="cell__pos">BB</span>
+    <span class="cell__net down">-50</span></header>
+  <div class="cell__cards"><span class="pc pc--heart"><span class="pc__r">2</span><span class="pc__s">&#9829;</span></span><span class="pc pc--club"><span class="pc__r">5</span><span class="pc__s">&#9827;</span></span></div>
+  <p class="cell__act">Folded to a 4-bet shove</p><span class="cell__bust">Montallin out in 8th</span>
+</article><article class="cell cell--won" data-tags="won played showdown"
+      data-hand="16" tabindex="0">
+  <header class="cell__top"><span class="cell__n">16</span>
+    <span class="cell__pos">SB</span>
+    <span class="cell__net up">+650</span></header>
+  <div class="cell__cards"><span class="pc pc--spade"><span class="pc__r">7</span><span class="pc__s">&#9824;</span></span><span class="pc pc--club"><span class="pc__r">7</span><span class="pc__s">&#9827;</span></span></div>
+  <p class="cell__act">Shoved 550 over an open, flopped set</p><span class="cell__note">Doubled with a 5bb stack</span>
+</article><article class="cell cell--fold" data-tags="fold sat-out"
+      data-hand="17" tabindex="0">
+  <header class="cell__top"><span class="cell__n">17</span>
+    <span class="cell__pos">BTN</span>
+    <span class="cell__net flat">even</span></header>
+  <div class="cell__cards"><span class="pc pc--diamond"><span class="pc__r">4</span><span class="pc__s">&#9830;</span></span><span class="pc pc--spade"><span class="pc__r">3</span><span class="pc__s">&#9824;</span></span></div>
+  <p class="cell__act">Folded</p>
+</article><article class="cell cell--fold" data-tags="fold sat-out"
+      data-hand="18" tabindex="0">
+  <header class="cell__top"><span class="cell__n">18</span>
+    <span class="cell__pos">CO</span>
+    <span class="cell__net flat">even</span></header>
+  <div class="cell__cards"><span class="pc pc--diamond"><span class="pc__r">8</span><span class="pc__s">&#9830;</span></span><span class="pc pc--heart"><span class="pc__r">K</span><span class="pc__s">&#9829;</span></span></div>
+  <p class="cell__act">Folded</p><span class="cell__bust">aquileslula out in 7th</span>
+</article><article class="cell cell--won" data-tags="won played showdown"
+      data-hand="19" tabindex="0">
+  <header class="cell__top"><span class="cell__n">19</span>
+    <span class="cell__pos">HJ</span>
+    <span class="cell__net up">+1,300</span></header>
+  <div class="cell__cards"><span class="pc pc--club"><span class="pc__r">T</span><span class="pc__s">&#9827;</span></span><span class="pc pc--club"><span class="pc__r">K</span><span class="pc__s">&#9827;</span></span></div>
+  <p class="cell__act">Opened, called a 3-bet shove, flopped top pair</p><span class="cell__note">Doubled through LucasCabra18</span>
+</article><article class="cell cell--fold" data-tags="fold sat-out"
+      data-hand="20" tabindex="0">
+  <header class="cell__top"><span class="cell__n">20</span>
+    <span class="cell__pos">CO</span>
+    <span class="cell__net flat">even</span></header>
+  <div class="cell__cards"><span class="pc pc--heart"><span class="pc__r">6</span><span class="pc__s">&#9829;</span></span><span class="pc pc--spade"><span class="pc__r">A</span><span class="pc__s">&#9824;</span></span></div>
+  <p class="cell__act">Folded</p><span class="cell__bust">LucasCabra18 out in 6th</span>
+</article><article class="cell cell--fold" data-tags="fold sat-out"
+      data-hand="21" tabindex="0">
+  <header class="cell__top"><span class="cell__n">21</span>
+    <span class="cell__pos">CO</span>
+    <span class="cell__net flat">even</span></header>
+  <div class="cell__cards"><span class="pc pc--heart"><span class="pc__r">4</span><span class="pc__s">&#9829;</span></span><span class="pc pc--diamond"><span class="pc__r">4</span><span class="pc__s">&#9830;</span></span></div>
+  <p class="cell__act">Folded to a short shove</p>
+</article><article class="cell cell--fold" data-tags="fold sat-out"
+      data-hand="22" tabindex="0">
+  <header class="cell__top"><span class="cell__n">22</span>
+    <span class="cell__pos">BB</span>
+    <span class="cell__net down">-100</span></header>
+  <div class="cell__cards"><span class="pc pc--diamond"><span class="pc__r">T</span><span class="pc__s">&#9830;</span></span><span class="pc pc--spade"><span class="pc__r">4</span><span class="pc__s">&#9824;</span></span></div>
+  <p class="cell__act">Folded to a shove and a call</p>
+</article><article class="cell cell--fold" data-tags="fold sat-out"
+      data-hand="23" tabindex="0">
+  <header class="cell__top"><span class="cell__n">23</span>
+    <span class="cell__pos">SB</span>
+    <span class="cell__net down">-75</span></header>
+  <div class="cell__cards"><span class="pc pc--diamond"><span class="pc__r">2</span><span class="pc__s">&#9830;</span></span><span class="pc pc--heart"><span class="pc__r">8</span><span class="pc__s">&#9829;</span></span></div>
+  <p class="cell__act">Folded</p>
+</article><article class="cell cell--won" data-tags="won played"
+      data-hand="24" tabindex="0">
+  <header class="cell__top"><span class="cell__n">24</span>
+    <span class="cell__pos">BTN</span>
+    <span class="cell__net up">+675</span></header>
+  <div class="cell__cards"><span class="pc pc--club"><span class="pc__r">A</span><span class="pc__s">&#9827;</span></span><span class="pc pc--club"><span class="pc__r">9</span><span class="pc__s">&#9827;</span></span></div>
+  <p class="cell__act">Opened, turned top pair, bet him off it</p>
+</article><article class="cell cell--fold" data-tags="fold sat-out"
+      data-hand="25" tabindex="0">
+  <header class="cell__top"><span class="cell__n">25</span>
+    <span class="cell__pos">CO</span>
+    <span class="cell__net flat">even</span></header>
+  <div class="cell__cards"><span class="pc pc--heart"><span class="pc__r">8</span><span class="pc__s">&#9829;</span></span><span class="pc pc--spade"><span class="pc__r">6</span><span class="pc__s">&#9824;</span></span></div>
+  <p class="cell__act">Folded</p>
+</article><article class="cell cell--fold" data-tags="fold sat-out"
+      data-hand="26" tabindex="0">
+  <header class="cell__top"><span class="cell__n">26</span>
+    <span class="cell__pos">CO</span>
+    <span class="cell__net flat">even</span></header>
+  <div class="cell__cards"><span class="pc pc--spade"><span class="pc__r">A</span><span class="pc__s">&#9824;</span></span><span class="pc pc--diamond"><span class="pc__r">4</span><span class="pc__s">&#9830;</span></span></div>
+  <p class="cell__act">Folded to a short shove</p>
+</article><article class="cell cell--won" data-tags="won played"
+      data-hand="27" tabindex="0">
+  <header class="cell__top"><span class="cell__n">27</span>
+    <span class="cell__pos">BB</span>
+    <span class="cell__net up">+525</span></header>
+  <div class="cell__cards"><span class="pc pc--club"><span class="pc__r">T</span><span class="pc__s">&#9827;</span></span><span class="pc pc--spade"><span class="pc__r">A</span><span class="pc__s">&#9824;</span></span></div>
+  <p class="cell__act">3-bet the limper, c-bet top pair</p>
+</article><article class="cell cell--fold" data-tags="fold sat-out"
+      data-hand="28" tabindex="0">
+  <header class="cell__top"><span class="cell__n">28</span>
+    <span class="cell__pos">SB</span>
+    <span class="cell__net down">-75</span></header>
+  <div class="cell__cards"><span class="pc pc--spade"><span class="pc__r">5</span><span class="pc__s">&#9824;</span></span><span class="pc pc--diamond"><span class="pc__r">4</span><span class="pc__s">&#9830;</span></span></div>
+  <p class="cell__act">Folded</p>
+</article><article class="cell cell--won" data-tags="won played showdown"
+      data-hand="29" tabindex="0">
+  <header class="cell__top"><span class="cell__n">29</span>
+    <span class="cell__pos">BTN</span>
+    <span class="cell__net up">+3,600</span></header>
+  <div class="cell__cards"><span class="pc pc--heart"><span class="pc__r">T</span><span class="pc__s">&#9829;</span></span><span class="pc pc--club"><span class="pc__r">K</span><span class="pc__s">&#9827;</span></span></div>
+  <p class="cell__act">Raised, three barrels, called his river shove</p><span class="cell__note">Biggest pot before heads-up</span>
+</article><article class="cell cell--fold" data-tags="fold sat-out"
+      data-hand="30" tabindex="0">
+  <header class="cell__top"><span class="cell__n">30</span>
+    <span class="cell__pos">CO</span>
+    <span class="cell__net flat">even</span></header>
+  <div class="cell__cards"><span class="pc pc--club"><span class="pc__r">2</span><span class="pc__s">&#9827;</span></span><span class="pc pc--heart"><span class="pc__r">6</span><span class="pc__s">&#9829;</span></span></div>
+  <p class="cell__act">Folded</p>
+</article><article class="cell cell--fold" data-tags="fold sat-out"
+      data-hand="31" tabindex="0">
+  <header class="cell__top"><span class="cell__n">31</span>
+    <span class="cell__pos">CO</span>
+    <span class="cell__net flat">even</span></header>
+  <div class="cell__cards"><span class="pc pc--diamond"><span class="pc__r">3</span><span class="pc__s">&#9830;</span></span><span class="pc pc--diamond"><span class="pc__r">A</span><span class="pc__s">&#9830;</span></span></div>
+  <p class="cell__act">Folded to a shove and a call</p>
+</article><article class="cell cell--lost" data-tags="lost played showdown"
+      data-hand="32" tabindex="0">
+  <header class="cell__top"><span class="cell__n">32</span>
+    <span class="cell__pos">BB</span>
+    <span class="cell__net down">-360</span></header>
+  <div class="cell__cards"><span class="pc pc--club"><span class="pc__r">9</span><span class="pc__s">&#9827;</span></span><span class="pc pc--heart"><span class="pc__r">2</span><span class="pc__s">&#9829;</span></span></div>
+  <p class="cell__act">Called a 360 shove, lost to K2s</p>
+</article><article class="cell cell--fold" data-tags="fold sat-out"
+      data-hand="33" tabindex="0">
+  <header class="cell__top"><span class="cell__n">33</span>
+    <span class="cell__pos">SB</span>
+    <span class="cell__net down">-100</span></header>
+  <div class="cell__cards"><span class="pc pc--diamond"><span class="pc__r">2</span><span class="pc__s">&#9830;</span></span><span class="pc pc--diamond"><span class="pc__r">3</span><span class="pc__s">&#9830;</span></span></div>
+  <p class="cell__act">Folded to a shove</p>
+</article><article class="cell cell--fold" data-tags="fold sat-out"
+      data-hand="34" tabindex="0">
+  <header class="cell__top"><span class="cell__n">34</span>
+    <span class="cell__pos">BTN</span>
+    <span class="cell__net flat">even</span></header>
+  <div class="cell__cards"><span class="pc pc--heart"><span class="pc__r">9</span><span class="pc__s">&#9829;</span></span><span class="pc pc--spade"><span class="pc__r">3</span><span class="pc__s">&#9824;</span></span></div>
+  <p class="cell__act">Folded</p><span class="cell__bust">Panuto out in 5th</span>
+</article><article class="cell cell--fold" data-tags="fold sat-out"
+      data-hand="35" tabindex="0">
+  <header class="cell__top"><span class="cell__n">35</span>
+    <span class="cell__pos">CO</span>
+    <span class="cell__net flat">even</span></header>
+  <div class="cell__cards"><span class="pc pc--diamond"><span class="pc__r">9</span><span class="pc__s">&#9830;</span></span><span class="pc pc--spade"><span class="pc__r">8</span><span class="pc__s">&#9824;</span></span></div>
+  <p class="cell__act">Folded</p>
+</article><article class="cell cell--lost" data-tags="lost sat-out showdown"
+      data-hand="36" tabindex="0">
+  <header class="cell__top"><span class="cell__n">36</span>
+    <span class="cell__pos">BB</span>
+    <span class="cell__net down">-600</span></header>
+  <div class="cell__cards"><span class="pc pc--diamond"><span class="pc__r">5</span><span class="pc__s">&#9830;</span></span><span class="pc pc--club"><span class="pc__r">5</span><span class="pc__s">&#9827;</span></span></div>
+  <p class="cell__act">C-bet a paired board, gave up, mucked</p>
+</article><article class="cell cell--won" data-tags="won played"
+      data-hand="37" tabindex="0">
+  <header class="cell__top"><span class="cell__n">37</span>
+    <span class="cell__pos">SB</span>
+    <span class="cell__net up">+200</span></header>
+  <div class="cell__cards"><span class="pc pc--heart"><span class="pc__r">K</span><span class="pc__s">&#9829;</span></span><span class="pc pc--heart"><span class="pc__r">7</span><span class="pc__s">&#9829;</span></span></div>
+  <p class="cell__act">Completed, big blind folded</p>
+</article><article class="cell cell--lost" data-tags="lost played"
+      data-hand="38" tabindex="0">
+  <header class="cell__top"><span class="cell__n">38</span>
+    <span class="cell__pos">BTN</span>
+    <span class="cell__net down">-400</span></header>
+  <div class="cell__cards"><span class="pc pc--diamond"><span class="pc__r">7</span><span class="pc__s">&#9830;</span></span><span class="pc pc--spade"><span class="pc__r">A</span><span class="pc__s">&#9824;</span></span></div>
+  <p class="cell__act">Called an open, folded to a c-bet</p>
+</article><article class="cell cell--fold" data-tags="fold sat-out"
+      data-hand="39" tabindex="0">
+  <header class="cell__top"><span class="cell__n">39</span>
+    <span class="cell__pos">CO</span>
+    <span class="cell__net flat">even</span></header>
+  <div class="cell__cards"><span class="pc pc--spade"><span class="pc__r">7</span><span class="pc__s">&#9824;</span></span><span class="pc pc--diamond"><span class="pc__r">Q</span><span class="pc__s">&#9830;</span></span></div>
+  <p class="cell__act">Folded</p><span class="cell__bust">thiagopok911 out in 4th</span>
+</article><article class="cell cell--fold" data-tags="fold sat-out"
+      data-hand="40" tabindex="0">
+  <header class="cell__top"><span class="cell__n">40</span>
+    <span class="cell__pos">SB</span>
+    <span class="cell__net down">-100</span></header>
+  <div class="cell__cards"><span class="pc pc--spade"><span class="pc__r">Q</span><span class="pc__s">&#9824;</span></span><span class="pc pc--club"><span class="pc__r">3</span><span class="pc__s">&#9827;</span></span></div>
+  <p class="cell__act">Folded</p>
+</article><article class="cell cell--fold" data-tags="fold sat-out"
+      data-hand="41" tabindex="0">
+  <header class="cell__top"><span class="cell__n">41</span>
+    <span class="cell__pos">BTN</span>
+    <span class="cell__net flat">even</span></header>
+  <div class="cell__cards"><span class="pc pc--diamond"><span class="pc__r">8</span><span class="pc__s">&#9830;</span></span><span class="pc pc--club"><span class="pc__r">2</span><span class="pc__s">&#9827;</span></span></div>
+  <p class="cell__act">Folded</p>
+</article><article class="cell cell--fold" data-tags="fold sat-out"
+      data-hand="42" tabindex="0">
+  <header class="cell__top"><span class="cell__n">42</span>
+    <span class="cell__pos">BB</span>
+    <span class="cell__net down">-200</span></header>
+  <div class="cell__cards"><span class="pc pc--heart"><span class="pc__r">6</span><span class="pc__s">&#9829;</span></span><span class="pc pc--diamond"><span class="pc__r">2</span><span class="pc__s">&#9830;</span></span></div>
+  <p class="cell__act">Folded to a raise</p>
+</article><article class="cell cell--won" data-tags="won played"
+      data-hand="43" tabindex="0">
+  <header class="cell__top"><span class="cell__n">43</span>
+    <span class="cell__pos">SB</span>
+    <span class="cell__net up">+200</span></header>
+  <div class="cell__cards"><span class="pc pc--club"><span class="pc__r">9</span><span class="pc__s">&#9827;</span></span><span class="pc pc--spade"><span class="pc__r">2</span><span class="pc__s">&#9824;</span></span></div>
+  <p class="cell__act">Raised, took it</p>
+</article><article class="cell cell--fold" data-tags="fold sat-out"
+      data-hand="44" tabindex="0">
+  <header class="cell__top"><span class="cell__n">44</span>
+    <span class="cell__pos">BTN</span>
+    <span class="cell__net flat">even</span></header>
+  <div class="cell__cards"><span class="pc pc--spade"><span class="pc__r">6</span><span class="pc__s">&#9824;</span></span><span class="pc pc--spade"><span class="pc__r">7</span><span class="pc__s">&#9824;</span></span></div>
+  <p class="cell__act">Folded</p>
+</article><article class="cell cell--walk" data-tags="walk sat-out"
+      data-hand="45" tabindex="0">
+  <header class="cell__top"><span class="cell__n">45</span>
+    <span class="cell__pos">BB</span>
+    <span class="cell__net up">+100</span></header>
+  <div class="cell__cards"><span class="pc pc--heart"><span class="pc__r">3</span><span class="pc__s">&#9829;</span></span><span class="pc pc--diamond"><span class="pc__r">2</span><span class="pc__s">&#9830;</span></span></div>
+  <p class="cell__act">Walk</p>
+</article><article class="cell cell--won" data-tags="won played"
+      data-hand="46" tabindex="0">
+  <header class="cell__top"><span class="cell__n">46</span>
+    <span class="cell__pos">SB</span>
+    <span class="cell__net up">+200</span></header>
+  <div class="cell__cards"><span class="pc pc--spade"><span class="pc__r">2</span><span class="pc__s">&#9824;</span></span><span class="pc pc--club"><span class="pc__r">A</span><span class="pc__s">&#9827;</span></span></div>
+  <p class="cell__act">Raised, took it</p>
+</article><article class="cell cell--won" data-tags="won played"
+      data-hand="47" tabindex="0">
+  <header class="cell__top"><span class="cell__n">47</span>
+    <span class="cell__pos">BTN</span>
+    <span class="cell__net up">+300</span></header>
+  <div class="cell__cards"><span class="pc pc--club"><span class="pc__r">K</span><span class="pc__s">&#9827;</span></span><span class="pc pc--heart"><span class="pc__r">4</span><span class="pc__s">&#9829;</span></span></div>
+  <p class="cell__act">Raised, took the blinds</p>
+</article><article class="cell cell--fold" data-tags="fold sat-out"
+      data-hand="48" tabindex="0">
+  <header class="cell__top"><span class="cell__n">48</span>
+    <span class="cell__pos">BB</span>
+    <span class="cell__net down">-200</span></header>
+  <div class="cell__cards"><span class="pc pc--club"><span class="pc__r">3</span><span class="pc__s">&#9827;</span></span><span class="pc pc--spade"><span class="pc__r">6</span><span class="pc__s">&#9824;</span></span></div>
+  <p class="cell__act">Folded to a raise</p>
+</article><article class="cell cell--won" data-tags="won played"
+      data-hand="49" tabindex="0">
+  <header class="cell__top"><span class="cell__n">49</span>
+    <span class="cell__pos">SB</span>
+    <span class="cell__net up">+650</span></header>
+  <div class="cell__cards"><span class="pc pc--spade"><span class="pc__r">5</span><span class="pc__s">&#9824;</span></span><span class="pc pc--diamond"><span class="pc__r">5</span><span class="pc__s">&#9830;</span></span></div>
+  <p class="cell__act">Called, c-bet the paired king board</p>
+</article><article class="cell cell--won" data-tags="won played showdown"
+      data-hand="50" tabindex="0">
+  <header class="cell__top"><span class="cell__n">50</span>
+    <span class="cell__pos">BTN</span>
+    <span class="cell__net up">+750</span></header>
+  <div class="cell__cards"><span class="pc pc--heart"><span class="pc__r">3</span><span class="pc__s">&#9829;</span></span><span class="pc pc--spade"><span class="pc__r">A</span><span class="pc__s">&#9824;</span></span></div>
+  <p class="cell__act">Raised, checked it down, ace-high pair good</p>
+</article><article class="cell cell--fold" data-tags="fold sat-out"
+      data-hand="51" tabindex="0">
+  <header class="cell__top"><span class="cell__n">51</span>
+    <span class="cell__pos">BB</span>
+    <span class="cell__net down">-225</span></header>
+  <div class="cell__cards"><span class="pc pc--club"><span class="pc__r">7</span><span class="pc__s">&#9827;</span></span><span class="pc pc--heart"><span class="pc__r">4</span><span class="pc__s">&#9829;</span></span></div>
+  <p class="cell__act">Folded, hakaii busted in 3rd</p><span class="cell__note">Heads-up starts</span><span class="cell__bust">hakaii out in 3rd</span>
+</article><article class="cell cell--won" data-tags="won played"
+      data-hand="52" tabindex="0">
+  <header class="cell__top"><span class="cell__n">52</span>
+    <span class="cell__pos">SB</span>
+    <span class="cell__net up">+225</span></header>
+  <div class="cell__cards"><span class="pc pc--spade"><span class="pc__r">T</span><span class="pc__s">&#9824;</span></span><span class="pc pc--diamond"><span class="pc__r">J</span><span class="pc__s">&#9830;</span></span></div>
+  <p class="cell__act">Raised, took it</p>
+</article><article class="cell cell--won" data-tags="won sat-out"
+      data-hand="53" tabindex="0">
+  <header class="cell__top"><span class="cell__n">53</span>
+    <span class="cell__pos">BB</span>
+    <span class="cell__net up">+225</span></header>
+  <div class="cell__cards"><span class="pc pc--diamond"><span class="pc__r">3</span><span class="pc__s">&#9830;</span></span><span class="pc pc--club"><span class="pc__r">J</span><span class="pc__s">&#9827;</span></span></div>
+  <p class="cell__act">Flopped two pair, c-bet, took it</p>
+</article><article class="cell cell--fold" data-tags="fold sat-out"
+      data-hand="54" tabindex="0">
+  <header class="cell__top"><span class="cell__n">54</span>
+    <span class="cell__pos">SB</span>
+    <span class="cell__net down">-125</span></header>
+  <div class="cell__cards"><span class="pc pc--heart"><span class="pc__r">4</span><span class="pc__s">&#9829;</span></span><span class="pc pc--spade"><span class="pc__r">6</span><span class="pc__s">&#9824;</span></span></div>
+  <p class="cell__act">Folded</p>
+</article><article class="cell cell--won" data-tags="won played"
+      data-hand="55" tabindex="0">
+  <header class="cell__top"><span class="cell__n">55</span>
+    <span class="cell__pos">BB</span>
+    <span class="cell__net up">+675</span></header>
+  <div class="cell__cards"><span class="pc pc--spade"><span class="pc__r">K</span><span class="pc__s">&#9824;</span></span><span class="pc pc--club"><span class="pc__r">J</span><span class="pc__s">&#9827;</span></span></div>
+  <p class="cell__act">Called a raise, flopped top pair, bet him off</p>
+</article><article class="cell cell--lost" data-tags="lost played"
+      data-hand="56" tabindex="0">
+  <header class="cell__top"><span class="cell__n">56</span>
+    <span class="cell__pos">SB</span>
+    <span class="cell__net down">-1,250</span></header>
+  <div class="cell__cards"><span class="pc pc--diamond"><span class="pc__r">8</span><span class="pc__s">&#9830;</span></span><span class="pc pc--club"><span class="pc__r">K</span><span class="pc__s">&#9827;</span></span></div>
+  <p class="cell__act">Raised, bet turn, folded to a river shove-size bet</p><span class="cell__note">Costliest heads-up pot</span>
+</article><article class="cell cell--lost" data-tags="lost sat-out"
+      data-hand="57" tabindex="0">
+  <header class="cell__top"><span class="cell__n">57</span>
+    <span class="cell__pos">BB</span>
+    <span class="cell__net down">-225</span></header>
+  <div class="cell__cards"><span class="pc pc--spade"><span class="pc__r">2</span><span class="pc__s">&#9824;</span></span><span class="pc pc--spade"><span class="pc__r">7</span><span class="pc__s">&#9824;</span></span></div>
+  <p class="cell__act">Checked, folded flop</p>
+</article><article class="cell cell--won" data-tags="won played"
+      data-hand="58" tabindex="0">
+  <header class="cell__top"><span class="cell__n">58</span>
+    <span class="cell__pos">SB</span>
+    <span class="cell__net up">+625</span></header>
+  <div class="cell__cards"><span class="pc pc--spade"><span class="pc__r">K</span><span class="pc__s">&#9824;</span></span><span class="pc pc--club"><span class="pc__r">7</span><span class="pc__s">&#9827;</span></span></div>
+  <p class="cell__act">Raised, flopped two pair, took it</p>
+</article><article class="cell cell--fold" data-tags="fold sat-out"
+      data-hand="59" tabindex="0">
+  <header class="cell__top"><span class="cell__n">59</span>
+    <span class="cell__pos">BB</span>
+    <span class="cell__net down">-225</span></header>
+  <div class="cell__cards"><span class="pc pc--heart"><span class="pc__r">2</span><span class="pc__s">&#9829;</span></span><span class="pc pc--heart"><span class="pc__r">6</span><span class="pc__s">&#9829;</span></span></div>
+  <p class="cell__act">Folded to an all-in</p>
+</article><article class="cell cell--fold" data-tags="fold sat-out"
+      data-hand="60" tabindex="0">
+  <header class="cell__top"><span class="cell__n">60</span>
+    <span class="cell__pos">SB</span>
+    <span class="cell__net down">-175</span></header>
+  <div class="cell__cards"><span class="pc pc--diamond"><span class="pc__r">J</span><span class="pc__s">&#9830;</span></span><span class="pc pc--club"><span class="pc__r">3</span><span class="pc__s">&#9827;</span></span></div>
+  <p class="cell__act">Folded</p>
+</article><article class="cell cell--fold" data-tags="fold sat-out"
+      data-hand="61" tabindex="0">
+  <header class="cell__top"><span class="cell__n">61</span>
+    <span class="cell__pos">BB</span>
+    <span class="cell__net down">-325</span></header>
+  <div class="cell__cards"><span class="pc pc--diamond"><span class="pc__r">2</span><span class="pc__s">&#9830;</span></span><span class="pc pc--club"><span class="pc__r">7</span><span class="pc__s">&#9827;</span></span></div>
+  <p class="cell__act">Folded to a raise</p>
+</article><article class="cell cell--won" data-tags="won played showdown"
+      data-hand="62" tabindex="0">
+  <header class="cell__top"><span class="cell__n">62</span>
+    <span class="cell__pos">SB</span>
+    <span class="cell__net up">+6,690</span></header>
+  <div class="cell__cards"><span class="pc pc--diamond"><span class="pc__r">8</span><span class="pc__s">&#9830;</span></span><span class="pc pc--diamond"><span class="pc__r">J</span><span class="pc__s">&#9830;</span></span></div>
+  <p class="cell__act">Raised, called his shove, flopped a full house</p><span class="cell__note">The tournament-winning hand</span>
+</article><article class="cell cell--lost" data-tags="lost sat-out showdown"
+      data-hand="63" tabindex="0">
+  <header class="cell__top"><span class="cell__n">63</span>
+    <span class="cell__pos">BB</span>
+    <span class="cell__net down">-120</span></header>
+  <div class="cell__cards"><span class="pc pc--spade"><span class="pc__r">7</span><span class="pc__s">&#9824;</span></span><span class="pc pc--diamond"><span class="pc__r">6</span><span class="pc__s">&#9830;</span></span></div>
+  <p class="cell__act">Chopped board, lost the last chips back</p>
+</article><article class="cell cell--won" data-tags="won played showdown"
+      data-hand="64" tabindex="0">
+  <header class="cell__top"><span class="cell__n">64</span>
+    <span class="cell__pos">SB</span>
+    <span class="cell__net up">+240</span></header>
+  <div class="cell__cards"><span class="pc pc--club"><span class="pc__r">8</span><span class="pc__s">&#9827;</span></span><span class="pc pc--spade"><span class="pc__r">T</span><span class="pc__s">&#9824;</span></span></div>
+  <p class="cell__act">Called the last all-in, flopped trip tens</p><span class="cell__note">Tournament won</span><span class="cell__bust">flaviosvb out in 2nd</span>
+</article>
+  </div>
+</section>
+
+<footer>Built from the PokerStars hand history for tournament 4020833874.
+Chip figures reconcile hand to hand against the transcript.</footer>
+</div>
+
+<script>
+(function(){
+  var btns = document.querySelectorAll('.filters button');
+  var cells = document.querySelectorAll('.cell');
+  btns.forEach(function(b){
+    b.addEventListener('click', function(){
+      btns.forEach(function(o){ o.setAttribute('aria-pressed', o===b ? 'true':'false'); });
+      var f = b.dataset.f;
+      cells.forEach(function(c){
+        c.classList.toggle('hide', f!=='all' && c.dataset.tags.split(' ').indexOf(f)===-1);
+      });
+    });
+  });
+  function link(c, on){
+    var d = document.getElementById('d'+c.dataset.hand);
+    if(d) d.classList.toggle('on', on);
+  }
+  cells.forEach(function(c){
+    c.addEventListener('mouseenter', function(){ link(c,true); });
+    c.addEventListener('mouseleave', function(){ link(c,false); });
+    c.addEventListener('focus', function(){ link(c,true); });
+    c.addEventListener('blur', function(){ link(c,false); });
+  });
+})();
+</script>
+</body>
+</html>
