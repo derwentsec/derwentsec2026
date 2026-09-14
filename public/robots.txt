@@ -1,0 +1,10 @@
+# robots.txt for https://derwentsec.com/
+
+User-agent: *
+Allow: /
+
+# Private / non-business pages - not part of the site
+Disallow: /gym.html
+Disallow: /trudiHands.html
+
+Sitemap: https://derwentsec.com/sitemap.xml
